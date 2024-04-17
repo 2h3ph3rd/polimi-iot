@@ -1,0 +1,251 @@
+[
+    {
+        "id": "a8d860fd5c07004e",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "b755f28c9019bbd3",
+        "type": "csv",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 1010,
+        "y": 420,
+        "wires": [
+            [
+                "f508e2a1e5b37987"
+            ]
+        ]
+    },
+    {
+        "id": "5002b297af51c196",
+        "type": "file in",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "filename": "./input.csv",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 840,
+        "y": 420,
+        "wires": [
+            [
+                "b755f28c9019bbd3"
+            ]
+        ]
+    },
+    {
+        "id": "eacef88566a6671c",
+        "type": "debug",
+        "z": "a8d860fd5c07004e",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1020,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "c8386dc34c17a2e3",
+        "type": "inject",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 570,
+        "y": 280,
+        "wires": [
+            [
+                "03720209d1a85534"
+            ]
+        ]
+    },
+    {
+        "id": "18ebc8199510f576",
+        "type": "mqtt out",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "topic": "challenge3/id_generator",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "34ebf6914169e0c0",
+        "x": 1070,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "b281bdb225300ad3",
+        "type": "file",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "filename": "./id_log.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 1030,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f0b980b3b1e2e7da",
+        "type": "mqtt in",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "topic": "challenge3/id_generator",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "34ebf6914169e0c0",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 560,
+        "y": 420,
+        "wires": [
+            [
+                "5002b297af51c196"
+            ]
+        ]
+    },
+    {
+        "id": "f508e2a1e5b37987",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "function 1",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1200,
+        "y": 420,
+        "wires": [
+            [
+                "3dfc8da565e328bd"
+            ]
+        ]
+    },
+    {
+        "id": "3dfc8da565e328bd",
+        "type": "switch",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1390,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "03720209d1a85534",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "function 2",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 280,
+        "wires": [
+            [
+                "18ebc8199510f576",
+                "eacef88566a6671c",
+                "b281bdb225300ad3"
+            ]
+        ]
+    },
+    {
+        "id": "34ebf6914169e0c0",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1884",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    }
+]
