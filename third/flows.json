@@ -8,7 +8,7 @@
         "env": []
     },
     {
-        "id": "b755f28c9019bbd3",
+        "id": "24aaaffd6d854937",
         "type": "csv",
         "z": "a8d860fd5c07004e",
         "name": "",
@@ -22,16 +22,16 @@
         "strings": true,
         "include_empty_strings": "",
         "include_null_values": "",
-        "x": 1010,
-        "y": 420,
+        "x": 1170,
+        "y": 400,
         "wires": [
             [
-                "f508e2a1e5b37987"
+                "05d9be951222609d"
             ]
         ]
     },
     {
-        "id": "5002b297af51c196",
+        "id": "879bc7d6c8d9d191",
         "type": "file in",
         "z": "a8d860fd5c07004e",
         "name": "",
@@ -42,33 +42,16 @@
         "sendError": false,
         "encoding": "none",
         "allProps": false,
-        "x": 840,
-        "y": 420,
+        "x": 1020,
+        "y": 400,
         "wires": [
             [
-                "b755f28c9019bbd3"
+                "24aaaffd6d854937"
             ]
         ]
     },
     {
-        "id": "eacef88566a6671c",
-        "type": "debug",
-        "z": "a8d860fd5c07004e",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1020,
-        "y": 200,
-        "wires": []
-    },
-    {
-        "id": "c8386dc34c17a2e3",
+        "id": "c3f2629b97d9b01a",
         "type": "inject",
         "z": "a8d860fd5c07004e",
         "name": "",
@@ -83,21 +66,21 @@
         ],
         "repeat": "5",
         "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
+        "once": true,
+        "onceDelay": "0.3",
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 570,
-        "y": 280,
+        "x": 850,
+        "y": 520,
         "wires": [
             [
-                "03720209d1a85534"
+                "68f0e5bd057e45df"
             ]
         ]
     },
     {
-        "id": "18ebc8199510f576",
+        "id": "454c5db0cd23d7fd",
         "type": "mqtt out",
         "z": "a8d860fd5c07004e",
         "name": "",
@@ -110,29 +93,29 @@
         "correl": "",
         "expiry": "",
         "broker": "34ebf6914169e0c0",
-        "x": 1070,
-        "y": 280,
+        "x": 1590,
+        "y": 560,
         "wires": []
     },
     {
-        "id": "b281bdb225300ad3",
+        "id": "b26bdd66d4d317d4",
         "type": "file",
         "z": "a8d860fd5c07004e",
         "name": "",
         "filename": "./id_log.csv",
         "filenameType": "str",
-        "appendNewline": true,
+        "appendNewline": false,
         "createDir": false,
         "overwriteFile": "false",
         "encoding": "none",
-        "x": 1030,
-        "y": 120,
+        "x": 1630,
+        "y": 480,
         "wires": [
             []
         ]
     },
     {
-        "id": "f0b980b3b1e2e7da",
+        "id": "19a550abb6014985",
         "type": "mqtt in",
         "z": "a8d860fd5c07004e",
         "name": "",
@@ -144,62 +127,492 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 560,
-        "y": 420,
+        "x": 860,
+        "y": 720,
         "wires": [
             [
-                "5002b297af51c196"
+                "e9291ba088ed2e72"
             ]
         ]
     },
     {
-        "id": "f508e2a1e5b37987",
+        "id": "e9291ba088ed2e72",
         "type": "function",
         "z": "a8d860fd5c07004e",
-        "name": "function 1",
-        "func": "\nreturn msg;",
+        "name": "Message parsing",
+        "func": "// Read inputCSV file\nvar input = flow.get(\"input\");\n\n// Save the MQTT Publish message for later use\nflow.set(\"publishMessage\", msg.payload);\n\n// Calculate remainder for row number\nvar remainder = msg.id % 7711;\n\nremainder = 78;\n\n// Read row with remainder as row number\n// No. starts from one\n// while arrays from zero\nvar inputRow = input[remainder-1];\n\n// Save the input row for later use\nflow.set(\"inputRow\", inputRow);\n\nnode.warn(inputRow);\n\n// The type field is used for the switch\n// It can contain only \"PUBLISH\" or \"ACK\"\n// If empty nothing will be done\nmsg.type = \"\";\n\n// Increase packet counter\nvar packetCounter = context.get(\"packetCounter\");\npacketCounter++;\ncontext.set(\"packetCounter\", packetCounter);\n\n// If more than 80 packet, skip any other check\nif (packetCounter > 80) {\n    return msg;\n}\n\n// Check if the row contains a Publish message\nif (inputRow[\"Info\"].indexOf(\"Publish Message\") != -1) {\n    msg.type = \"PUBLISH\";\n    return msg;\n} \n\n// Check if the row contains an ACK message\nif (inputRow[\"Info\"].indexOf(\"Ack\") != -1) {\n    msg.type = \"ACK\";\n    return msg;\n}\n\n// If here it means that the packet \n// is still in the 80 packet count to be processed, \n// but it is not an ACK or a Publish message.\nnode.warn(\"Skipped\")\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "// Initialize packet counter\nif (context.get(\"packetCounter\") === undefined) {\n    context.set(\"packetCounter\", 0)\n}",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 720,
+        "wires": [
+            [
+                "7473ee406fd43c22"
+            ]
+        ]
+    },
+    {
+        "id": "7473ee406fd43c22",
+        "type": "switch",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "property": "type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "PUBLISH",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ACK",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 1270,
+        "y": 720,
+        "wires": [
+            [
+                "59cef53514b5c630"
+            ],
+            [
+                "5af98dfa3d11cece"
+            ]
+        ]
+    },
+    {
+        "id": "68f0e5bd057e45df",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "ID Generator",
+        "func": "// Generate an integer random number\n// in the range [0, 50000]\nvar randomNumber = Math.round(Math.random() * 50000);\n\n// Set the base payload with the \n// current timestamp and the generated id\nmsg.payload = {\n    id: randomNumber,\n    timestamp: msg.payload,\n};\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1200,
-        "y": 420,
+        "x": 1030,
+        "y": 520,
         "wires": [
             [
-                "3dfc8da565e328bd"
+                "7c50378170a538c9",
+                "faa96383e5a72d25"
             ]
         ]
     },
     {
-        "id": "3dfc8da565e328bd",
-        "type": "switch",
+        "id": "23919db688886f40",
+        "type": "inject",
         "z": "a8d860fd5c07004e",
         "name": "",
-        "property": "payload",
-        "propertyType": "msg",
-        "rules": [
+        "props": [
             {
-                "t": "eq",
-                "v": "",
+                "p": "payload"
+            },
+            {
+                "p": "topic",
                 "vt": "str"
             }
         ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 1390,
-        "y": 420,
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 830,
+        "y": 340,
+        "wires": [
+            [
+                "826e95f457e0834e",
+                "879bc7d6c8d9d191"
+            ]
+        ]
+    },
+    {
+        "id": "a8f8c81ce3db6cc2",
+        "type": "file",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "filename": "./id_log.csv",
+        "filenameType": "str",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1250,
+        "y": 220,
         "wires": [
             []
         ]
     },
     {
-        "id": "03720209d1a85534",
+        "id": "826e95f457e0834e",
         "type": "function",
         "z": "a8d860fd5c07004e",
-        "name": "function 2",
+        "name": "Empty payload",
+        "func": "msg.payload = \"\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 280,
+        "wires": [
+            [
+                "a8f8c81ce3db6cc2",
+                "c6792e6ad7b47d71",
+                "a6144e4539605b31"
+            ]
+        ]
+    },
+    {
+        "id": "05d9be951222609d",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "Save input file inside the flow",
+        "func": "flow.set(\"input\", msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1380,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f95830232a9b6e92",
+        "type": "mqtt out",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "34ebf6914169e0c0",
+        "x": 2070,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "f44f2b68aced15f6",
+        "type": "delay",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "4",
+        "nbRateUnits": "1",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1890,
+        "y": 680,
+        "wires": [
+            [
+                "f95830232a9b6e92",
+                "9221e0e4051a0df0"
+            ]
+        ]
+    },
+    {
+        "id": "5af98dfa3d11cece",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "Handle ACK messages",
+        "func": "// Get MQTT Publish message and input row from flow\nvar publishMessage = flow.get(\"publishMessage\");\nvar inputRow = flow.get(\"inputRow\");\n\n// Prepare row for CSV\nmsg.payload = {\n    \"TIMESTAMP\": publishMessage.timestamp,\n    \"SUB_ID\": publishMessage.id,\n    \"MSG_TYPE\": inputRow[\"Info\"],\n};\n\nnode.warn(msg.payload);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1470,
+        "y": 760,
+        "wires": [
+            [
+                "ebbe125618d75b9e"
+            ]
+        ]
+    },
+    {
+        "id": "c6792e6ad7b47d71",
+        "type": "file",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "filename": "./filtered_pubs.csv",
+        "filenameType": "str",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1270,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a6144e4539605b31",
+        "type": "file",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "filename": "./ack_log.csv",
+        "filenameType": "str",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1250,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f9db617daabb8b41",
+        "type": "comment",
+        "z": "a8d860fd5c07004e",
+        "name": "Initialization",
+        "info": "",
+        "x": 650,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "7c50378170a538c9",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "Prepare payload for csv",
+        "func": "// Increment row counter\nvar rowCounter = context.get(\"rowCounter\");\nrowCounter++;\ncontext.set(\"rowCounter\", rowCounter);\n\n// Set payload for csv export\nmsg.payload = {\n    \"No.\": rowCounter,\n    \"ID\": msg.payload.id,\n    \"TIMESTAMP\": msg.payload.timestamp,\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "if (context.get(\"rowCounter\") === undefined) {\n    context.set(\"rowCounter\", 0)\n}",
+        "finalize": "",
+        "libs": [],
+        "x": 1270,
+        "y": 480,
+        "wires": [
+            [
+                "421832d832299421"
+            ]
+        ]
+    },
+    {
+        "id": "faa96383e5a72d25",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "Prepare payload for MQTT Publish",
+        "func": "// Log object before sending\nnode.warn(msg.payload);\n\n// The base payload can be sent directly\n// but it must be converted to JSON\nmsg.payload = JSON.stringify(msg.payload);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1300,
+        "y": 560,
+        "wires": [
+            [
+                "454c5db0cd23d7fd"
+            ]
+        ]
+    },
+    {
+        "id": "1891a5466ecb1c39",
+        "type": "split",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 1570,
+        "y": 680,
+        "wires": [
+            [
+                "a7853fb9f25f4fe1"
+            ]
+        ]
+    },
+    {
+        "id": "9221e0e4051a0df0",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "Prepare data for chart",
+        "func": "var parsedPayload = JSON.parse(msg.payload[\"Payload\"]);\n\n/*\nif (parsedPayload.type == \"temperature\"\n    && parsedPayload.unit == \"F\") {\n        msg.\n}\n*/\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "if (context.get(\"COUNT\") === undefined) {\n    context.set(\"COUNT\", 0)\n}",
+        "finalize": "",
+        "libs": [],
+        "x": 2120,
+        "y": 720,
+        "wires": [
+            [
+                "b8eddff33ee6faf8"
+            ]
+        ]
+    },
+    {
+        "id": "b8eddff33ee6faf8",
+        "type": "ui_chart",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "group": "01a39c76ed4b87d7",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "chart",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 2310,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "928fd003ebd91143",
+        "type": "file",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "filename": "./ack_log.csv",
+        "filenameType": "str",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 1830,
+        "y": 760,
+        "wires": [
+            [
+                "4e5b187a1de769fb"
+            ]
+        ]
+    },
+    {
+        "id": "4e5b187a1de769fb",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "Prepare ThingSpeak request",
+        "func": "var apiKey = \"QD3KTDDP0TLD13HX\";\n\n// Increase ACK counter\nvar ackCounter = context.get(\"ackCounter\");\nackCounter++;\ncontext.set(\"ackCounter\", ackCounter);\n\nmsg.url = \"https://api.thingspeak.com/update?api_key=\"\nmsg.url += apiKey;\nmsg.url += \"&field1=\"\nmsg.url += ackCounter;\n\nnode.warn(msg.url)\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "// Initialize ACK packet counter\nif (context.get(\"ackCounter\") === undefined) {\n    context.set(\"ackCounter\", 0)\n}",
+        "finalize": "",
+        "libs": [],
+        "x": 2060,
+        "y": 760,
+        "wires": [
+            [
+                "9c785e54e736523a"
+            ]
+        ]
+    },
+    {
+        "id": "9c785e54e736523a",
+        "type": "http request",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 2290,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "59cef53514b5c630",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "function 8",
+        "func": "// Get MQTT Publish message and input row from flow\nvar publishMessage = flow.get(\"publishMessage\");\nvar inputRow = flow.get(\"inputRow\");\n\nmsg.payload = {\n    timestamp: publishMessage.timestamp,\n    id: publishMessage.id,\n    payload: inputRow[\"Payload\"],\n};\n\nvar topicStart = msg.row[\"Info\"].indexOf(\"[\") + 1;\nvar topicEnd = msg.row[\"Info\"].indexOf(\"]\") - 1;\n\nmsg.topic = msg.row[\"Info\"].substr(topicStart, topicEnd - topicStart);\nnode.warn(msg.topic);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1420,
+        "y": 680,
+        "wires": [
+            [
+                "1891a5466ecb1c39"
+            ]
+        ]
+    },
+    {
+        "id": "a7853fb9f25f4fe1",
+        "type": "function",
+        "z": "a8d860fd5c07004e",
+        "name": "function 9",
         "func": "\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
@@ -207,13 +620,67 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 800,
-        "y": 280,
+        "x": 1720,
+        "y": 680,
         "wires": [
             [
-                "18ebc8199510f576",
-                "eacef88566a6671c",
-                "b281bdb225300ad3"
+                "f44f2b68aced15f6"
+            ]
+        ]
+    },
+    {
+        "id": "b289e38886e92663",
+        "type": "comment",
+        "z": "a8d860fd5c07004e",
+        "name": "Publish",
+        "info": "",
+        "x": 630,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "ebbe125618d75b9e",
+        "type": "csv",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "once",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 1670,
+        "y": 760,
+        "wires": [
+            [
+                "928fd003ebd91143"
+            ]
+        ]
+    },
+    {
+        "id": "421832d832299421",
+        "type": "csv",
+        "z": "a8d860fd5c07004e",
+        "name": "",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "once",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 1470,
+        "y": 480,
+        "wires": [
+            [
+                "b26bdd66d4d317d4"
             ]
         ]
     },
@@ -247,5 +714,24 @@
         "willMsg": {},
         "userProps": "",
         "sessionExpiry": ""
+    },
+    {
+        "id": "01a39c76ed4b87d7",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "783ef7b6dfaf25ea",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "783ef7b6dfaf25ea",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
     }
 ]
