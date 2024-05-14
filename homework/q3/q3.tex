@@ -1,0 +1,29 @@
+\documentclass[12pt]{article}
+
+\input{../preamble.tex}
+
+\title{Internet of Things - Homework - Question 3}
+\author{Francesco Pastore 10629332}
+\date{05-14-2024}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Question}
+
+You are required to design an IoT system to monitor the status of the production process in a small indoor bacterial cellulose factory.
+The factory is operated in a small university lab (100sqm) and has about 20 bacterial cellulose growing basins, which must be monitored continuously to ensure the growing process is successful.
+The main parameters to be monitored are luminosity (2 bytes), content of sugar (2 bytes) and pH of the growing solution (1 byte).
+Growing bacterial cellulose is a slow process, with growing cycles of about 14 days.
+Monitoring cycles of 1 hour are needed to allow for changing the environmental parameters for an optimal process.
+
+3. As an add-on, you are required to install a VGA camera (640x480 pixels, 8 bits per pixel) to monitor the status of the growing process. Is the solution proposed at the previous points still valid? If not, propose an alternative solution.
+
+\textbf{Answer}
+
+The use of WiFi technology for communication between the sensors and the central unit allows high data rates, making it suitable even if a VGA camera is added to the system.
+
+MQTT is also still a valid choice for the application protocol, as it still allows data to be sent from the sensors to the central server.
+
+\end{document}

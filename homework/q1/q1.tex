@@ -1,0 +1,40 @@
+\documentclass[12pt]{article}
+
+\input{../preamble.tex}
+
+\title{Internet of Things - Homework - Question 1}
+\author{Francesco Pastore 10629332}
+\date{05-14-2024}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Question}
+
+You are required to design an IoT system to monitor the status of the production process in a small indoor bacterial cellulose factory.
+The factory is operated in a small university lab (100sqm) and has about 20 bacterial cellulose growing basins, which must be monitored continuously to ensure the growing process is successful.
+The main parameters to be monitored are luminosity (2 bytes), content of sugar (2 bytes) and pH of the growing solution (1 byte).
+Growing bacterial cellulose is a slow process, with growing cycles of about 14 days.
+Monitoring cycles of 1 hour are needed to allow for changing the environmental parameters for an optimal process.
+
+1. Propose an overall design for the system, mainly focusing on the communication technology to be used. Motivate your choice.
+
+\textbf{Answer}
+
+Each sensor could be made with an ESP32 board for its low cost and ability to connect to the WiFi network.
+
+If possible, they could be powered directly with a continuous power supply to avoid the need for batteries.
+Otherwise, a battery could be used, which would need to be checked and replaced if necessary.
+
+From the communication point of view, since the required IoT system will operate in a small indoor area, I would suggest using short-range communication technology.
+
+In particular, to simplify the design and implementation of the system, I would suggest using WiFi technology for communication between the sensors and the central server.
+This would make it easier to implement the system and directly use the WiFi capabilities of the ESP32 cards.
+
+The application protocol to be used could be MQTT, with all the sensors as different publishers and the central unit as a subscriber.
+This would allow for a simple and efficient way to send data from the sensors to the central server.
+
+The MQTT broker could run directly on the central server, which could also be used to store data and provide a web interface to monitor the status of the whole system.
+
+\end{document}

@@ -1,0 +1,66 @@
+\documentclass[12pt]{article}
+
+\input{../preamble.tex}
+
+\title{Internet of Things - Homework - Question 2}
+\author{Francesco Pastore 10629332}
+\date{05-14-2024}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Question}
+
+You are required to design an IoT system to monitor the status of the production process in a small indoor bacterial cellulose factory.
+The factory is operated in a small university lab (100sqm) and has about 20 bacterial cellulose growing basins, which must be monitored continuously to ensure the growing process is successful.
+The main parameters to be monitored are luminosity (2 bytes), content of sugar (2 bytes) and pH of the growing solution (1 byte).
+Growing bacterial cellulose is a slow process, with growing cycles of about 14 days.
+Monitoring cycles of 1 hour are needed to allow for changing the environmental parameters for an optimal process.
+
+2. Write the pseudocode of the firmware that should be run by the monitoring device installed on each basin.
+
+\textbf{Answer}
+
+Each monitoring device should first go through a setup phase to prepare the sensors and communication modules.
+In particular, they should connect to the Wi-Fi network and the MQTT broker.
+Then, if needed, it should set up the luminosity, sugar content, and pH sensors.
+
+After the setup phase, the monitoring device should enter a loop where it reads the luminosity, sugar content and pH values.
+It then sends the data to the central server and goes into deep sleep mode for 1 hour.
+This process should then be repeated indefinitely to continuously monitor the production status.
+
+To recognise the monitoring device, a unique sensor ID could be assigned to each device.
+This could allow the central server to identify the source of the data and monitor the status of each basin.
+This value should be sent along with the data in the MQTT publish message.
+
+In alternative, different topics could be used for each sensor, with the sensor ID included in the topic name.
+
+\begin{verbatim}
+sensor_id = 1
+
+mqtt_host = "10.0.0.1"
+mqtt_port = 1883
+
+wifi_ssid = "my_wifi"
+wifi_password = "my_password"
+
+function setup():
+    setup_wifi(wifi_ssid, wifi_password)
+    setup_mqtt_client(mqtt_host, mqtt_port)
+
+    setup_luminosity_sensor()
+    setup_sugar_content_sensor()
+    setup_ph_sensor()
+
+function loop():
+    luminosity = read_luminosity()
+    sugar_content = read_sugar_content()
+    ph = read_ph()
+
+    send_data(sensor_id, luminosity, sugar_content, ph)
+
+    deep_sleep(1 hour)
+\end{verbatim}
+
+\end{document}
