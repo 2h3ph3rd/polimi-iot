@@ -22,7 +22,15 @@ In the end, there were some questions to answer about the packets exchanged.
 
 ### Third Challenge
 
-WIP
+The third challenge was about Node-Red and the creation of a simple flow that sends and receives data through MQTT.
+
+Data were randomly generated and sent to a broker, then received by a subscriber and stored in CSV files.
+
+In addition, some rules were provided to filter the data and store them in different files.
+
+Everything was handled through Node-Red components in addition to the MQTT broker running locally with Mosquitto.
+
+![](./third/flow.png)
 
 ## Misc
 
