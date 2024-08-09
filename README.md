@@ -32,6 +32,16 @@ Everything was handled through Node-Red components in addition to the MQTT broke
 
 ![](./third/flow.png)
 
+### Homework
+
+The homework involved questions and exercises about some of the topics covered during the course.
+
+There were three main parts:
+
+1. IoT system design
+2. Short-range connectivity
+3. Long-range connectivity
+
 ## Misc
 
 Command to print a Jupyter notebook:
