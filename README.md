@@ -1,6 +1,6 @@
 # Polimi IoT
 
-My solutions for the challenges of the Internet of Thing course at Polimi during the academic year 2023/2024.
+My solutions for the challenges of the Internet of Things course at Polimi during the academic year 2023/2024.
 
 ## Challenges
 
@@ -47,5 +47,5 @@ There were three main parts:
 Command to print a Jupyter notebook:
 
 ```
-jupyter nbconvert --to PDF --LatexPreprocessor.title "Internet of Things - Second Challenge" --LatexPreprocessor.author_names "Francesco Pastore 10629332" "report.ipynb"
+jupyter nbconvert --to PDF --LatexPreprocessor.title "Final report" --LatexPreprocessor.author_names "Mario Rossi" "report.ipynb"
 ```
